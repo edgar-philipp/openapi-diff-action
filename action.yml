@@ -7,10 +7,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v3
+    - name: Checkout Git Repository
+      uses: actions/checkout@v3
       with:
         fetch-depth: 2
-    - id: diff-file
+    - name: Verify Diffs on OpenAPI File
+      id: diff-file
       run: $GITHUB_ACTION_PATH/openapi_diff.sh
       shell: bash
       env:
