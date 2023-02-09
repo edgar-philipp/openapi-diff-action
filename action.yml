@@ -4,10 +4,6 @@ inputs:
   changed-file:  
     description: 'the OpenAPI file to check'
     required: true
-outputs:
-  matrix:
-    description: "GitHub Matrix in JSON format with changed files"
-    value: ${{ steps.transform-to-matrix.outputs.matrix }}
 runs:
   using: "composite"
   steps:
