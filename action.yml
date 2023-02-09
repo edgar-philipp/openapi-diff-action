@@ -1,0 +1,28 @@
+name: 'Diff on OpenAPI file'
+description: 'Shows the changes to the given OpenAPI yaml file, check that all changes are backwards-compatible'
+inputs:
+  changed-file:  
+    description: 'the OpenAPI file to check'
+    required: true
+outputs:
+  matrix:
+    description: "GitHub Matrix in JSON format with changed files"
+    value: ${{ steps.transform-to-matrix.outputs.matrix }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
+    - id: diff-file
+      run: $GITHUB_ACTION_PATH/openapi_diff.sh
+      shell: bash
+      env:
+        GITHUB_SERVER_URL: ${{ github.server_url }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_REF: ${{ github.ref }}
+        GITHUB_SHA: ${{ github.sha }}
+        GITHUB_WORKSPACE: ${{ github.workspace }}
+        PREVIOUS_HASH: ${{ github.event.before }}
+        CURRENT_HASH: ${{ github.event.after }}
+        CHANGED_FILE: ${{ inputs.changed-file }}
