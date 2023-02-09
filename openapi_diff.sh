@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "::group::openapi-diff"
+echo "::group::OpenAPI Diff"
 
 echo "Get current version of file ${CHANGED_FILE}, commit ${CURRENT_HASH}"
 git show ${CURRENT_HASH}:${CHANGED_FILE} > ${CHANGED_FILE}_new.yml
