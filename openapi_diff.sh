@@ -1,17 +1,22 @@
 #!/bin/bash
 
-echo "::group::list-changed-files"
+echo "::group::openapi-diff"
 
-echo "git log --oneline"
-echo $(git log --oneline)
+echo "Get current version of file $CHANGED_FILE, commit ${CURRENT_HASH}"
+git show ${CURRENT_HASH}:${changed_file} > ${changed_file}_new.yml
+ls ${changed_file}_new.yml
 
-# filter M = modified
-command="git diff-tree --diff-filter=M --no-commit-id --name-only -r $CURRENT_HASH -- '${PATH_FILTER}/*.yml' '${PATH_FILTER}/*.yaml'"
-echo $command 
-list=$( eval $command)
-echo "Changed files: $list"
+echo "Get previous version of file $CHANGED_FILE, commit ${PREVIOUS_HASH}"
+git show ${PREVIOUS_HASH}:${changed_file} > ${changed_file}_old.yml
+ls ${changed_file}_old.yml
 
-changed_files="${list[*]//$'\n'/ }"
-echo "changed_files=${changed_files}" >> $GITHUB_OUTPUT
+echo "Show diff"
+git diff ${PREVIOUS_HASH} ${CURRENT_HASH} -- ${changed_file}
+
+echo "Check for breaking changes"
+java -jar openapi-diff-cli-2.1.0.jar ${changed_file}_old.yml ${changed_file}_new.yml --fail-on-incompatible
+if [ $? -ne 0 ]; then
+  exit 1
+fi
 
 echo "::endgroup::"
